@@ -1,300 +1,279 @@
-⸻
+---
 
-📘 Smart Session dApp — Base Mainnet + Reown AppKit
+# 🚀 Smart Session Dapp
+
+### Reown AppKit + Wagmi + Viem + Base Mainnet
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Built%20on-Base-0052FF?logo=base&logoColor=white" />
-  <img src="https://img.shields.io/badge/Powered%20by-Reown%20AppKit-2D3EEF?logo=walletconnect&logoColor=white" />
-  <img src="https://img.shields.io/badge/Web3-WalletConnect%202.0-3B99FC?logo=walletconnect&logoColor=white" />
-  <img src="https://img.shields.io/badge/Smart%20Sessions-Enabled-7A5AF8?logo=ethereum&logoColor=white" />
-  <img src="https://img.shields.io/badge/Frontend-React%20%2B%20Vite-646CFF?logo=react&logoColor=white" />
-  <img src="https://img.shields.io/badge/Backend-Viem%20Wallet%20Client-000?logo=ethereum&logoColor=white" />
-  <img src="https://img.shields.io/badge/Contracts-Hardhat%200.8.24-orange?logo=hardhat&logoColor=white" />
+  <img src="https://img.shields.io/badge/chain-base-blue.svg" />
+  <img src="https://img.shields/badge/appkit-reown-orange.svg" />
+  <img src="https://img.shields.io/badge/smart--sessions-enabled-brightgreen.svg" />
+  <img src="https://img.shields.io/github/actions/workflow/status/cryptoflops/smart-session-dapp/ci.yml?label=build" />
+  <img src="https://img.shields.io/github/last-commit/cryptoflops/smart-session-dapp" />
+  <img src="https://img.shields.io/badge/license-MIT-green.svg" />
 </p>
 
+A production-ready example demonstrating **WalletConnect Smart Sessions** using **Reown AppKit**, fully integrated with a React + Wagmi frontend and an Express backend executor.
+The project includes:
 
+* A deployed & verified Base Mainnet contract
+* Full frontend dApp with session granting UI
+* Smart Session backend executor
+* End-to-end Reown AppKit + Wagmi integration
+* Hardhat deployment + verification workflows
+* GitHub CI + issue templates + open-source docs
 
-⸻
+Designed for builders participating in **WalletConnect Rewards**, **Talent Protocol**, and on-chain hackathons.
 
-✨ Overview
+---
 
-This repository contains a full-stack Smart Session dApp, deployed to Base Mainnet, showcasing an advanced, modern Web3 developer workflow:
-	•	🚀 Smart Session execution
-	•	🔐 Backend delegated execution
-	•	🔌 AppKit (WalletConnect Reown) integration
-	•	🔗 Wagmi + Viem contract interaction
-	•	⚡ Hardhat deployment + verification
-	•	🎨 React + Vite + Tailwind UI
+# 🧠 Overview
 
-This project demonstrates secure delegated transaction execution and is optimized for:
-	•	Talent Protocol Builder Rewards
-	•	WalletConnect / Reown builder leaderboard
-	•	Base ecosystem developer showcases
-	•	Public GitHub portfolio visibility
+This repository provides a complete working implementation of:
 
-⸻
+### 🔹 Smart Session Contract
 
-🧠 Architecture Diagram
+A minimal, safe smart contract deployed to **Base Mainnet** to demonstrate session calls.
 
-┌────────────────────────────┐
-│        React Frontend      │
-│  - AppKit WalletKit UI     │
-│  - Wagmi + Viem calls      │
-│  - Session grant flow       │
-└───────────────┬────────────┘
-                │
-                ▼
-┌────────────────────────────┐
-│   Smart Session Backend     │
-│  - Express API (/execute)   │
-│  - wallet_prepareCalls RPC  │
-│  - Raw tx signing (Viem)    │
-└───────────────┬────────────┘
-                │
-                ▼
-┌────────────────────────────┐
-│     Base Mainnet (L2)      │
-│  Verified Contract Address  │
-│  0x1363...57644             │
-└────────────────────────────┘
+### 🔹 Smart Session Backend
 
+A secure backend that prepares & signs Smart Session calls and interacts with WalletConnect RPC methods.
 
-⸻
+### 🔹 Smart Session Frontend
 
-🔗 Deployed Contract
+A React/Vite/Wagmi dApp with Reown AppKit for granting sessions and executing on-chain actions.
 
-SmartSessionTarget.sol
+---
 
-Network: Base Mainnet (Chain ID 8453)
-Address: 0x1363FfBE6e5280c2a310BE7b50Eaad4d3Bc57644
-Status: ✔ Verified on BaseScan
-https://basescan.org/address/0x1363FfBE6e5280c2a310BE7b50Eaad4d3Bc57644#code
+# 📡 Live Contract
 
-⸻
+**SmartSessionTarget** deployed & verified on Base Mainnet:
 
-🧱 Smart Contract Source
+```
+0x1363FfBE6e5280c2a310BE7b50Eaad4d3Bc57644
+```
 
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+Verified on BaseScan.
 
-contract SmartSessionTarget {
-    uint256 private _number;
+---
 
-    event NumberUpdated(uint256 newValue, address executor);
+# 🧱 Architecture
 
-    function store(uint256 newNumber) external {
-        _number = newNumber;
-        emit NumberUpdated(newNumber, msg.sender);
-    }
+```
+smart-session-dapp/
+│
+├── src/                 # React + Wagmi + AppKit frontend
+│   ├── components/      # Session UI components
+│   ├── lib/             # wagmi config, appkit config, contracts
+│   └── main.tsx         # App bootstrap
+│
+├── server/              # Smart Session executor backend
+│   ├── index.ts         # Express app
+│   ├── prepareCalls.ts  # Prepares Smart Session RPC calls
+│   ├── signAndSend.ts   # Executes signed Smart Session calls
+│   └── config.ts        # RPC config, project ID, private key
+│
+├── contracts/           # Solidity contracts
+│   └── SmartSessionTarget.sol
+│
+├── scripts/             # Hardhat deployment scripts
+│   └── deploy.cjs
+│
+├── .github/             # CI, issue templates, PR templates
+│
+└── vercel.json          # Frontend deployment config
+```
 
-    function get() external view returns (uint256) {
-        return _number;
-    }
-}
+---
 
+# ✨ Features
 
-⸻
+### 🔹 Reown AppKit Integration
 
-📁 Folder Structure
+* Wallet connection
+* Account abstraction
+* Session management
+* Wallet-aware UX
 
-contracts/         # Solidity smart contracts (Hardhat)
-scripts/           # Deployment scripts
-server/            # Smart Session backend (Node + Viem)
-src/               # Frontend (React + Vite + Wagmi + AppKit)
-public/screenshots # UI screenshots
-.github/           # CI, issue templates, PR templates
-.env.example       # Environment template
-README.md
+### 🔹 Smart Session Backend
 
+* Prepares session calls
+* Uses WalletConnect RPC:
 
-⸻
+  * `wallet_prepareCalls`
+  * `wallet_sendCalls`
+* Signs with backend key
 
-⚙️ Installation & Setup
+### 🔹 Smart Session Frontend
 
-1️⃣ Install dependencies
+* AppKit session UI
+* Contract interaction panel
+* Session-aware UX
 
+### 🔹 Hardhat + Viem
+
+* Clean deploy script
+* Base Mainnet deployment
+* Automated contract verification
+
+### 🔹 Open-Source Ready
+
+* CI pipeline
+* Issue templates
+* Contribution guidelines
+* MIT license
+
+---
+
+# 🛠 Getting Started
+
+### 1. Install dependencies
+
+```bash
 npm install
+```
 
-2️⃣ Create .env
+### 2. Copy environment file
 
-Copy the example file:
-
+```bash
 cp .env.example .env
+```
 
-Fill required fields:
+Fill in:
 
-APPLICATION_PRIVATE_KEY=0xYOUR_PRIVATE_KEY
-BASESCAN_API_KEY=YOUR_BASESCAN_API_KEY
-
-VITE_REOWN_PROJECT_ID=YOUR_REOWN_PROJECT_ID
+```
+APPLICATION_PRIVATE_KEY=
+VITE_REOWN_PROJECT_ID=
 VITE_SMART_SESSION_TARGET_ADDRESS=0x1363FfBE6e5280c2a310BE7b50Eaad4d3Bc57644
+```
 
-BACKEND_PORT=8787
+### 3. Run frontend
 
+```bash
+npm run dev
+```
 
-⸻
+### 4. Run backend
 
-🛰 Backend (Smart Session Executor)
-
-Runs the delegated transaction signing engine.
-
-Start backend:
-
+```bash
 npm run dev:server
+```
 
-Endpoint:
+Backend runs on:
 
-POST /execute
+```
+http://localhost:8787
+```
 
-Accepts:
+---
 
+# 🔧 Deploying the Contract
+
+To deploy on Base:
+
+```bash
+npx hardhat run scripts/deploy.cjs --network base
+```
+
+To verify:
+
+```bash
+npx hardhat verify --network base <DEPLOYED_ADDRESS>
+```
+
+---
+
+# 🚀 Deploying the Frontend
+
+Vercel is recommended:
+
+1. Push repo to GitHub
+2. Import repo in Vercel
+3. Add env vars:
+
+   * `VITE_REOWN_PROJECT_ID`
+   * `VITE_SMART_SESSION_TARGET_ADDRESS`
+
+`vercel.json` is already configured.
+
+---
+
+# 📘 API Endpoints (Backend)
+
+### **POST /execute**
+
+Body:
+
+```json
 {
   "userAddress": "0x...",
   "chainId": 8453,
+  "contractAddress": "0x...",
   "functionName": "store",
   "args": ["77"]
 }
+```
 
-Backend:
-	•	Prepares WC Smart Session call
-	•	Signs raw transaction (via Viem)
-	•	Sends it to Base Mainnet
+Executes Smart Session → contract call.
 
-⸻
+---
 
-🌐 Frontend (React + AppKit)
+# 🤝 Contributions Welcome
 
-Start the dApp:
+This project actively welcomes:
 
-npm run dev
+* WalletConnect / Reown AppKit enhancements
+* Smart Session utilities
+* Contract examples
+* Bug fixes
+* PR improvements
+* Ecosystem integrations
 
-Includes:
-	•	WalletConnect AppKit onboarding
-	•	Session grant UI
-	•	Contract read/write panels
-	•	Smart Session transaction execution
+All contributors appear on **Talent Protocol Leaderboards**.
 
-⸻
+---
 
-🧪 Hardhat Workflow
+# 🔒 Security
 
-Compile:
+See `SECURITY.md`.
 
-npx hardhat compile
+Smart sessions can delegate powerful capabilities — always audit scopes & backend execution.
 
-Deploy:
+---
 
-npx hardhat run scripts/deploy.cjs --network base
-
-Verify:
-
-npx hardhat verify --network base 0x1363FfBE6e5280c2a310BE7b50Eaad4d3Bc57644
-
-
-⸻
-
-🔍 Screenshots (Recommended)
-
-Place your screenshots in:
-
-public/screenshots/
-
-Example README section:
-
-## 📸 Screenshots
-
-### Smart Session Flow  
-<img src="./public/screenshots/smart-session-flow.png" width="700"/>
-
-### Contract Execution  
-<img src="./public/screenshots/contract-execute.png" width="700"/>
-
-### Wallet Onboarding  
-<img src="./public/screenshots/wallet-connect.png" width="700"/>
-
-
-⸻
-
-🧪 GitHub Actions (CI/CD)
-
-The project includes:
-
-.github/workflows/ci.yml
-
-Features:
-	•	Node setup
-	•	Install
-	•	Type-check (tsc)
-	•	Build frontend
-	•	Compile Hardhat contracts
-
-⸻
-
-🏆 Talent Protocol / WalletConnect Builder Scoring
-
-This repository is optimized for builder programs:
-
-✔ Public verified contract
-
-✔ Open-source dApp
-
-✔ Multiple commits over time
-
-✔ Smart Sessions implementation
-
-✔ Reown AppKit integration
-
-✔ Hardhat deploy + verify
-
-✔ Backend + frontend + contract
-
-✔ Documentation + CI workflows
-
-✔ Good README + screenshots
-
-Use these hashtags in your TalentProtocol submission:
-
-#Base #WalletConnect #Reown #SmartSessions #Wagmi #Viem
-#Hardhat #React #Vite #Web3 #dApp #Onchain #TalentProtocol
-
-
-⸻
-
-🤝 Contributing
-
-Contributions welcome!
-	•	Fork the repo
-	•	Create a feature branch
-	•	Build + test
-	•	Submit PR
-
-See: CONTRIBUTING.md
-
-⸻
-
-🛡 Security
-	•	Never commit private keys
-	•	Use .env
-	•	Backend signer must be low-value
-	•	Report vulnerabilities privately
-
-See: SECURITY.md.
-
-⸻
-
-📜 License
+# 📄 License
 
 MIT License.
+See `LICENSE`.
 
-You may use, fork, modify, or distribute freely.
+---
 
-⸻
+# 🙌 Credits
 
-🎉 Final Notes
+Built using:
 
-This README is formatted for:
-	•	GitHub
-	•	Talent Protocol
-	•	WalletConnect Builder leaderboard
-	•	Base ecosystem showcases
-	•	Open-source visibility
+* **Reown AppKit (WalletConnect)**
+* **Wagmi v2**
+* **Viem**
+* **Base Mainnet**
+* **Hardhat**
+* **TypeScript**
+
+---
+
+# 🪪 Author
+
+**0x0Cf485F4c6b2a6087B4D5d4A590cAe8d22D7FA9a**
+ENS: `cryptoflops.base.eth` | `psyhodivka.eth`
+
+---
+
+# 🎉 Final Note
+
+This repository is structured, optimized, and documented to score highly across:
+
+* WalletConnect Builders Program
+* Talent Protocol Builder Rewards
+* GitHub ecosystem visibility
+* Base ecosystem grant evaluations
+* Open-source credibility
