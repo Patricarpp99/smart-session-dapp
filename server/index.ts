@@ -1,50 +1,74 @@
+import "dotenv/config";
 import express from "express";
-import bodyParser from "body-parser";
 import cors from "cors";
+import bodyParser from "body-parser";
+import { Contract } from "ethers";
 
-import { walletPrepareCalls } from "./prepareCalls";
-import { executeSmartSessionCall } from "./signAndSend";
-import { TARGET_ABI, TARGET_ADDRESS } from "./contracts";
-import { PORT } from "./config";
-import { encodeFunctionData } from "viem";
+import {
+  CHAIN_CONFIG,
+  getBackendWallet,
+  type SupportedChainId,
+} from "./config.js";
+import { getTargetAddress, smartSessionAbi } from "./contracts.js";
 
 const app = express();
+const PORT = process.env.PORT || 8787;
+
 app.use(cors());
 app.use(bodyParser.json());
 
+app.get("/health", (_req, res) => {
+  res.json({ status: "ok" });
+});
+
 app.post("/execute", async (req, res) => {
+  const { userAddress, chainId, functionName, args, contractAddress } = req.body;
+
+  console.log("API /execute:", req.body);
+
   try {
-    const { userAddress, chainId, functionName, args } = req.body;
+    if (!CHAIN_CONFIG[chainId]) {
+      return res.status(400).json({ error: "Unsupported chainId" });
+    }
 
-    const data = encodeFunctionData({
-      abi: TARGET_ABI,
-      functionName,
-      args,
+    const target =
+      contractAddress || getTargetAddress(chainId as SupportedChainId);
+
+    if (!target) {
+      return res.status(400).json({
+        error: "Missing contract address for this chain",
+      });
+    }
+
+    if (functionName !== "store") {
+      return res.status(400).json({ error: "Unsupported functionName" });
+    }
+
+    const wallet = getBackendWallet(chainId);
+    const contract = new Contract(target, smartSessionAbi, wallet);
+
+    const [value] = args || [];
+
+    const tx = await contract.store(BigInt(value));
+    console.log("TX:", tx.hash);
+
+    const receipt = await tx.wait();
+
+    return res.json({
+      status: "ok",
+      txHash: tx.hash,
+      blockNumber: receipt.blockNumber,
+      explorerUrl: `${CHAIN_CONFIG[chainId].explorerUrl}/tx/${tx.hash}`,
     });
-
-    const params = [
-      {
-        from: userAddress,
-        chainId: "0x2105", // Base mainnet
-        calls: [
-          {
-            to: TARGET_ADDRESS,
-            data,
-          },
-        ],
-        capabilities: {},
-      }
-    ];
-
-    const prepared = await walletPrepareCalls(params);
-    const txHash = await executeSmartSessionCall(prepared);
-
-    return res.json({ success: true, txHash });
   } catch (err) {
-    return res.status(400).json({ error: err.message });
+    console.error("execute error", err);
+    return res.status(500).json({
+      error: "Execution failed",
+      details: err.message ?? String(err),
+    });
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Smart Session backend running at http://localhost:${PORT}`);
-});
+app.listen(PORT, () =>
+  console.log(`Backend running → http://localhost:${PORT}`)
+);
