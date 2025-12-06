@@ -14,6 +14,16 @@ interface UseLenisOptions {
     touchMultiplier?: number;
     /** Enable infinite scroll (default: false) */
     infinite?: boolean;
+    /** Gesture orientation (default: vertical) */
+    orientation?: 'vertical' | 'horizontal';
+    /** Gesture direction (default: 1) */
+    gestureOrientation?: 'vertical' | 'horizontal' | 'both';
+    /** Smooth touch (default: false for better touchpad support) */
+    smoothTouch?: boolean;
+    /** Sync touch lerp (default: 0.1) */
+    syncTouch?: boolean;
+    /** Sync touch lerp value */
+    syncTouchLerp?: number;
 }
 
 // Premium easing function - easeOutExpo
@@ -28,7 +38,12 @@ export function useLenis(options: UseLenisOptions = {}) {
         const lenis = new Lenis({
             duration: options.duration ?? 1.2,
             easing: options.easing ?? easeOutExpo,
+            orientation: options.orientation ?? 'vertical',
+            gestureOrientation: options.gestureOrientation ?? 'vertical',
             smoothWheel: options.smoothWheel ?? true,
+            smoothTouch: options.smoothTouch ?? false,
+            syncTouch: options.syncTouch ?? true,
+            syncTouchLerp: options.syncTouchLerp ?? 0.075,
             wheelMultiplier: options.wheelMultiplier ?? 1,
             touchMultiplier: options.touchMultiplier ?? 2,
             infinite: options.infinite ?? false,
@@ -49,7 +64,19 @@ export function useLenis(options: UseLenisOptions = {}) {
             lenis.destroy();
             lenisRef.current = null;
         };
-    }, [options.duration, options.easing, options.smoothWheel, options.wheelMultiplier, options.touchMultiplier, options.infinite]);
+    }, [
+        options.duration,
+        options.easing,
+        options.smoothWheel,
+        options.wheelMultiplier,
+        options.touchMultiplier,
+        options.infinite,
+        options.orientation,
+        options.gestureOrientation,
+        options.smoothTouch,
+        options.syncTouch,
+        options.syncTouchLerp
+    ]);
 
     return lenisRef;
 }
@@ -57,10 +84,13 @@ export function useLenis(options: UseLenisOptions = {}) {
 // Provider component for app-wide Lenis
 export function LenisProvider({ children }: { children: React.ReactNode }) {
     useLenis({
-        duration: 1.2,
+        duration: 1.0,
         smoothWheel: true,
+        smoothTouch: false,
+        syncTouch: true,
+        syncTouchLerp: 0.075,
         wheelMultiplier: 1,
-        touchMultiplier: 2,
+        touchMultiplier: 1.5,
     });
 
     return <>{children}</>;

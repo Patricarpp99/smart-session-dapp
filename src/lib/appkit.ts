@@ -3,7 +3,7 @@ import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { base, optimism, celo } from "wagmi/chains";
 
 const projectId = import.meta.env.VITE_REOWN_PROJECT_ID as string | undefined;
-const appName = import.meta.env.VITE_APP_NAME || "Smart Session Playground";
+const appName = import.meta.env.VITE_APP_NAME || "Smart Session Dapp";
 const appUrl = import.meta.env.VITE_APP_URL || "http://localhost:5173";
 const appIcon = import.meta.env.VITE_APP_ICON_URL || appUrl + "/favicon.ico";
 
@@ -31,20 +31,21 @@ export const appKit = createAppKit({
   metadata: {
     name: appName,
     description:
-      "Multichain smart-session playground on Base, Optimism, and Celo.",
+      "Secure, temporary, revocable on-chain session permissions for Web3.",
     url: appUrl,
     icons: [appIcon],
   },
   features: {
     email: true,
     socials: ["google", "x", "github"],
-    // Smart Sessions are enabled at the wallet UX level,
-    // but this demo executes via a backend signer.
     smartSessions: true,
   },
+  themeMode: 'dark',
   themeVariables: {
-    "--w3m-accent": "#4f46e5",
-    "--w3m-border-radius-master": "16px",
-    "--w3m-font-size-master": "14px",
+    '--w3m-accent': '#00F0FF',
+    '--w3m-color-mix': '#0B0C15',
+    '--w3m-color-mix-strength': 40,
+    '--w3m-border-radius-master': '1px',
+    '--w3m-font-size-master': '10px',
   },
 });

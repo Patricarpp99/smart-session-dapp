@@ -1,10 +1,16 @@
 import React from 'react';
 import { Shield, Zap, Lock, Clock, ArrowRight, CheckCircle2, Layers, Fingerprint } from 'lucide-react';
-import { AppKitButton } from "@reown/appkit/react";
+import { useAppKit } from "@reown/appkit/react";
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
 
 export function LandingPage() {
+    const { open } = useAppKit();
+
+    const handleConnectWallet = () => {
+        open();
+    };
+
     return (
         <div className="flex flex-col items-center min-h-[90vh]">
             {/* Hero Section */}
@@ -25,11 +31,9 @@ export function LandingPage() {
 
                 {/* Headline */}
                 <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold font-display tracking-tight mb-6 animate-slide-up">
-                    <span className="text-text-primary">Secure </span>
-                    <span className="gradient-text">Sessions</span>
+                    <span className="text-text-primary">Sign Once.</span>
                     <br />
-                    <span className="text-text-primary">Zero </span>
-                    <span className="gradient-text-primary">Friction</span>
+                    <span className="gradient-text">Transact Freely.</span>
                 </h1>
 
                 {/* Subheadline */}
@@ -41,7 +45,9 @@ export function LandingPage() {
 
                 {/* CTA */}
                 <div className="flex flex-col sm:flex-row gap-4 items-center animate-slide-up animation-delay-200">
-                    <AppKitButton />
+                    <Button onClick={handleConnectWallet} size="lg" className="text-lg px-8">
+                        Connect Wallet
+                    </Button>
                     <a
                         href="https://github.com/cryptoflops/smart-session-dapp"
                         target="_blank"
@@ -213,7 +219,9 @@ export function LandingPage() {
                 <p className="text-text-secondary text-lg mb-8">
                     Connect your wallet and experience frictionless Web3
                 </p>
-                <AppKitButton />
+                <Button onClick={handleConnectWallet} size="lg" className="text-lg px-8">
+                    Connect Wallet
+                </Button>
             </section>
         </div>
     );
