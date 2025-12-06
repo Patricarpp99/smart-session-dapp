@@ -6,9 +6,10 @@ import { Button } from '../ui/Button';
 
 interface NavbarProps {
     onMenuClick?: () => void;
+    onLogoClick?: () => void;
 }
 
-export function Navbar({ onMenuClick }: NavbarProps) {
+export function Navbar({ onMenuClick, onLogoClick }: NavbarProps) {
     const { open } = useAppKit();
     const { isConnected } = useAccount();
 
@@ -23,14 +24,18 @@ export function Navbar({ onMenuClick }: NavbarProps) {
                         <Menu className="h-6 w-6" />
                     </button>
 
-                    <div className="flex items-center gap-2">
+                    {/* Clickable Logo */}
+                    <button
+                        onClick={onLogoClick}
+                        className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                    >
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
                             <Shield className="h-5 w-5" />
                         </div>
                         <span className="text-lg font-bold tracking-tight text-text-primary font-display">
                             Smart Session
                         </span>
-                    </div>
+                    </button>
                 </div>
 
                 <div className="flex items-center gap-3">

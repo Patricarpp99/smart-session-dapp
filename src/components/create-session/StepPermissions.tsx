@@ -1,59 +1,132 @@
 import React from 'react';
-import { Check, Plus, Trash2 } from 'lucide-react';
+import { Check, Plus, Trash2, Shield, Zap, DollarSign, Edit } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 
 interface StepPermissionsProps {
-    value: any[];
-    onChange: (value: any[]) => void;
+    value: string[];
+    onChange: (value: string[]) => void;
+    targetName?: string;
 }
 
-export function StepPermissions({ value, onChange }: StepPermissionsProps) {
+// Predefined permission templates based on common dapp functions
+const PERMISSION_TEMPLATES = [
+    {
+        id: 'swap',
+        name: 'Token Swaps',
+        description: 'Allow swapping tokens',
+        icon: Zap,
+        functions: ['swap', 'swapExactTokensForTokens', 'exactInputSingle']
+    },
+    {
+        id: 'approve',
+        name: 'Token Approvals',
+        description: 'Allow approving token spending',
+        icon: Check,
+        functions: ['approve', 'increaseAllowance']
+    },
+    {
+        id: 'transfer',
+        name: 'Token Transfers',
+        description: 'Allow transferring tokens',
+        icon: DollarSign,
+        functions: ['transfer', 'transferFrom']
+    },
+    {
+        id: 'lend',
+        name: 'Lending Operations',
+        description: 'Allow supply, borrow, repay',
+        icon: Shield,
+        functions: ['supply', 'borrow', 'repay', 'withdraw']
+    }
+];
+
+export function StepPermissions({ value, onChange, targetName }: StepPermissionsProps) {
+    const togglePermission = (permId: string) => {
+        if (value.includes(permId)) {
+            onChange(value.filter(p => p !== permId));
+        } else {
+            onChange([...value, permId]);
+        }
+    };
+
+    const selectAll = () => {
+        onChange(PERMISSION_TEMPLATES.map(p => p.id));
+    };
+
+    const clearAll = () => {
+        onChange([]);
+    };
+
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <h3 className="text-xl font-semibold">Define Permissions</h3>
+                <h3 className="text-xl font-semibold font-display">Define Permissions</h3>
                 <p className="text-text-secondary">
-                    Specify which functions the session key can call and how much value it can spend.
+                    Choose which actions {targetName || 'the Dapp'} can perform on your behalf.
                 </p>
             </div>
 
-            <div className="space-y-4">
-                {/* Permission List */}
-                {value.length === 0 ? (
-                    <Card variant="bordered" className="border-dashed flex flex-col items-center justify-center py-8 text-center">
-                        <p className="text-text-secondary mb-4">No permissions added yet.</p>
-                        <Button variant="secondary" onClick={() => onChange([...value, { type: 'contract-call', target: 'Any' }])}>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Permission
-                        </Button>
-                    </Card>
-                ) : (
-                    <div className="space-y-3">
-                        {value.map((perm, index) => (
-                            <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10">
-                                <div className="flex items-center gap-3">
-                                    <div className="h-8 w-8 rounded-full bg-success/20 flex items-center justify-center text-success">
-                                        <Check className="h-4 w-4" />
-                                    </div>
-                                    <div>
-                                        <div className="font-medium">Contract Call</div>
-                                        <div className="text-sm text-text-secondary">Target: Any Contract</div>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => onChange(value.filter((_, i) => i !== index))}
-                                    className="text-text-secondary hover:text-danger transition-colors"
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </button>
+            {/* Quick Actions */}
+            <div className="flex gap-2">
+                <Button variant="ghost" size="sm" onClick={selectAll}>
+                    Select All
+                </Button>
+                <Button variant="ghost" size="sm" onClick={clearAll}>
+                    Clear All
+                </Button>
+            </div>
+
+            {/* Permission Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {PERMISSION_TEMPLATES.map((perm) => {
+                    const isSelected = value.includes(perm.id);
+                    const Icon = perm.icon;
+
+                    return (
+                        <button
+                            key={perm.id}
+                            onClick={() => togglePermission(perm.id)}
+                            className={`flex items-start gap-3 p-4 rounded-xl border transition-all text-left ${isSelected
+                                    ? 'border-success bg-success/10'
+                                    : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20'
+                                }`}
+                        >
+                            <div className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${isSelected ? 'bg-success/20 text-success' : 'bg-white/10 text-text-muted'
+                                }`}>
+                                {isSelected ? <Check className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
                             </div>
-                        ))}
-                        <Button variant="ghost" className="w-full border border-dashed border-white/20" onClick={() => onChange([...value, { type: 'contract-call', target: 'Any' }])}>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Another Permission
-                        </Button>
-                    </div>
+                            <div className="flex-1 min-w-0">
+                                <div className={`font-semibold ${isSelected ? 'text-success' : 'text-text-primary'}`}>
+                                    {perm.name}
+                                </div>
+                                <div className="text-xs text-text-muted mt-1">
+                                    {perm.description}
+                                </div>
+                                <div className="flex flex-wrap gap-1 mt-2">
+                                    {perm.functions.slice(0, 2).map(fn => (
+                                        <span key={fn} className="text-xs px-2 py-0.5 rounded bg-white/10 text-text-muted font-mono">
+                                            {fn}
+                                        </span>
+                                    ))}
+                                    {perm.functions.length > 2 && (
+                                        <span className="text-xs px-2 py-0.5 rounded bg-white/10 text-text-muted">
+                                            +{perm.functions.length - 2}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                        </button>
+                    );
+                })}
+            </div>
+
+            {/* Selected Count */}
+            <div className="text-sm text-text-secondary">
+                {value.length === 0 ? (
+                    <span className="text-warning">⚠️ Select at least one permission to continue</span>
+                ) : (
+                    <span className="text-success">✓ {value.length} permission{value.length > 1 ? 's' : ''} selected</span>
                 )}
             </div>
         </div>

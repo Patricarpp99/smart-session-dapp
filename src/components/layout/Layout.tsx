@@ -15,9 +15,16 @@ export function Layout({ children, onNavigate, currentView = 'dashboard' }: Layo
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const { isConnected } = useAccount();
 
+    const handleLogoClick = () => {
+        onNavigate?.('dashboard');
+    };
+
     return (
         <div className="min-h-screen bg-background text-text-primary">
-            <Navbar onMenuClick={() => setSidebarOpen(true)} />
+            <Navbar
+                onMenuClick={() => setSidebarOpen(true)}
+                onLogoClick={handleLogoClick}
+            />
 
             <div className="flex h-[calc(100vh-4rem)]">
                 {/* Only show sidebar when connected */}

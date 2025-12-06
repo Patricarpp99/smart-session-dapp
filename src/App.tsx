@@ -82,20 +82,30 @@ function AppContent() {
     }
   };
 
-  const handleCreateComplete = () => {
+  const handleCreateComplete = (formData: { targetAddress: string; targetName: string; permissions: string[]; expiry: string }) => {
+    const getExpiryMs = (expiry: string): number => {
+      switch (expiry) {
+        case '1h': return 60 * 60 * 1000;
+        case '1d': return 24 * 60 * 60 * 1000;
+        case '1w': return 7 * 24 * 60 * 60 * 1000;
+        case '1m': return 30 * 24 * 60 * 60 * 1000;
+        default: return 60 * 60 * 1000;
+      }
+    };
+
     const newSession: Session = {
       id: `session-${Date.now()}`,
-      targetAddress: '0x1234567890123456789012345678901234567890',
-      targetName: 'New Session',
-      permissions: ['transfer', 'approve'],
-      expiry: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+      targetAddress: formData.targetAddress,
+      targetName: formData.targetName || 'Custom Session',
+      permissions: formData.permissions,
+      expiry: new Date(Date.now() + getExpiryMs(formData.expiry)).toISOString(),
       status: 'active',
       createdAt: new Date().toISOString(),
       chainId: 8453
     };
     setSessions([newSession, ...sessions]);
     setView('dashboard');
-    success('Session created successfully');
+    success('Session created successfully! 🎉');
   };
 
   const handleNavigate = (newView: View) => {
