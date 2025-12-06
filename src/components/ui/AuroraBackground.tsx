@@ -2,8 +2,8 @@ import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useAccount, useChainId } from 'wagmi';
 
-// Network color themes
-const NETWORK_THEMES = {
+// Network color themes with full color schemes
+export const NETWORK_THEMES = {
     // Base - Blue gradient
     8453: {
         name: 'Base',
@@ -11,7 +11,9 @@ const NETWORK_THEMES = {
         secondary: '#00A3FF',
         tertiary: '#0066CC',
         accent: '#00F0FF',
-        background: 'rgba(0, 82, 255, 0.08)',
+        gradientFrom: 'rgba(0, 82, 255, 0.4)',
+        gradientTo: 'rgba(0, 163, 255, 0.3)',
+        bgColor: '#050A14',
     },
     // Optimism - Red gradient  
     10: {
@@ -20,16 +22,20 @@ const NETWORK_THEMES = {
         secondary: '#FF4D4D',
         tertiary: '#CC0000',
         accent: '#FF6B6B',
-        background: 'rgba(255, 4, 32, 0.08)',
+        gradientFrom: 'rgba(255, 4, 32, 0.4)',
+        gradientTo: 'rgba(255, 77, 77, 0.3)',
+        bgColor: '#140505',
     },
     // Celo - Yellow/Green gradient
     42220: {
         name: 'Celo',
-        primary: '#FCFF52',
-        secondary: '#35D07F',
+        primary: '#35D07F',
+        secondary: '#FCFF52',
         tertiary: '#FBCC5C',
         accent: '#73E17D',
-        background: 'rgba(53, 208, 127, 0.08)',
+        gradientFrom: 'rgba(53, 208, 127, 0.4)',
+        gradientTo: 'rgba(252, 255, 82, 0.3)',
+        bgColor: '#0A1408',
     },
     // Default - Cyan (not connected)
     default: {
@@ -38,17 +44,18 @@ const NETWORK_THEMES = {
         secondary: '#7000FF',
         tertiary: '#00A3FF',
         accent: '#00F0FF',
-        background: 'rgba(0, 240, 255, 0.08)',
+        gradientFrom: 'rgba(0, 240, 255, 0.3)',
+        gradientTo: 'rgba(112, 0, 255, 0.2)',
+        bgColor: '#0B0C15',
     },
 };
 
 interface AuroraBackgroundProps {
     children?: React.ReactNode;
     className?: string;
-    intensity?: 'low' | 'medium' | 'high';
 }
 
-export function AuroraBackground({ children, className = '', intensity = 'medium' }: AuroraBackgroundProps) {
+export function AuroraBackground({ children, className = '' }: AuroraBackgroundProps) {
     const { isConnected } = useAccount();
     const chainId = useChainId();
 
@@ -57,23 +64,23 @@ export function AuroraBackground({ children, className = '', intensity = 'medium
         return NETWORK_THEMES[chainId as keyof typeof NETWORK_THEMES] || NETWORK_THEMES.default;
     }, [isConnected, chainId]);
 
-    const opacityMultiplier = intensity === 'low' ? 0.5 : intensity === 'high' ? 1.5 : 1;
-
     return (
-        <div className={`relative overflow-hidden ${className}`}>
-            {/* Aurora gradient blobs */}
-            <div className="absolute inset-0 -z-10 overflow-hidden">
-                {/* Primary blob - largest, slowest */}
+        <div
+            className={`relative overflow-hidden ${className}`}
+            style={{ backgroundColor: theme.bgColor }}
+        >
+            {/* Aurora gradient blobs - more visible with stronger opacity */}
+            <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+                {/* Primary blob - largest, moves slowly */}
                 <motion.div
-                    className="absolute rounded-full blur-[120px]"
+                    className="absolute -top-1/4 -left-1/4 w-[80vw] h-[80vh] rounded-full opacity-70"
                     style={{
-                        width: '60%',
-                        height: '60%',
-                        background: `radial-gradient(circle, ${theme.primary}40, transparent 70%)`,
+                        background: `radial-gradient(circle at center, ${theme.gradientFrom}, transparent 60%)`,
+                        filter: 'blur(60px)',
                     }}
                     animate={{
-                        x: ['0%', '30%', '-10%', '20%', '0%'],
-                        y: ['0%', '20%', '40%', '10%', '0%'],
+                        x: ['0%', '20%', '5%', '15%', '0%'],
+                        y: ['0%', '15%', '25%', '10%', '0%'],
                         scale: [1, 1.1, 0.95, 1.05, 1],
                     }}
                     transition={{
@@ -83,18 +90,17 @@ export function AuroraBackground({ children, className = '', intensity = 'medium
                     }}
                 />
 
-                {/* Secondary blob */}
+                {/* Secondary blob - top right */}
                 <motion.div
-                    className="absolute right-0 top-0 rounded-full blur-[100px]"
+                    className="absolute -top-1/4 -right-1/4 w-[70vw] h-[70vh] rounded-full opacity-60"
                     style={{
-                        width: '50%',
-                        height: '50%',
-                        background: `radial-gradient(circle, ${theme.secondary}35, transparent 70%)`,
+                        background: `radial-gradient(circle at center, ${theme.gradientTo}, transparent 60%)`,
+                        filter: 'blur(80px)',
                     }}
                     animate={{
-                        x: ['0%', '-30%', '10%', '-20%', '0%'],
-                        y: ['0%', '30%', '-10%', '20%', '0%'],
-                        scale: [1, 0.95, 1.1, 1, 1],
+                        x: ['0%', '-25%', '5%', '-15%', '0%'],
+                        y: ['0%', '20%', '-10%', '15%', '0%'],
+                        scale: [1, 0.9, 1.1, 0.95, 1],
                     }}
                     transition={{
                         duration: 25,
@@ -104,53 +110,44 @@ export function AuroraBackground({ children, className = '', intensity = 'medium
                     }}
                 />
 
-                {/* Tertiary blob - accent */}
+                {/* Tertiary blob - bottom center */}
                 <motion.div
-                    className="absolute bottom-0 left-1/4 rounded-full blur-[80px]"
+                    className="absolute -bottom-1/4 left-1/4 w-[60vw] h-[60vh] rounded-full opacity-50"
                     style={{
-                        width: '40%',
-                        height: '40%',
-                        background: `radial-gradient(circle, ${theme.tertiary}30, transparent 70%)`,
+                        background: `radial-gradient(circle at center, ${theme.gradientFrom}, transparent 50%)`,
+                        filter: 'blur(100px)',
                     }}
                     animate={{
-                        x: ['0%', '20%', '-15%', '10%', '0%'],
-                        y: ['0%', '-20%', '10%', '-15%', '0%'],
+                        x: ['0%', '15%', '-20%', '10%', '0%'],
+                        y: ['0%', '-20%', '5%', '-10%', '0%'],
                         scale: [1, 1.05, 0.9, 1.1, 1],
                     }}
                     transition={{
                         duration: 18,
                         repeat: Infinity,
                         ease: 'easeInOut',
-                        delay: 4,
+                        delay: 5,
                     }}
                 />
 
                 {/* Small accent blob */}
                 <motion.div
-                    className="absolute top-1/3 right-1/4 rounded-full blur-[60px]"
+                    className="absolute top-1/2 left-1/2 w-[40vw] h-[40vh] rounded-full opacity-40"
                     style={{
-                        width: '25%',
-                        height: '25%',
-                        background: `radial-gradient(circle, ${theme.accent}25, transparent 70%)`,
+                        background: `radial-gradient(circle at center, ${theme.accent}50, transparent 60%)`,
+                        filter: 'blur(50px)',
+                        transform: 'translate(-50%, -50%)',
                     }}
                     animate={{
-                        x: ['-10%', '30%', '0%', '20%', '-10%'],
-                        y: ['10%', '-15%', '25%', '0%', '10%'],
-                        scale: [1, 1.2, 0.85, 1.1, 1],
+                        x: ['-50%', '-40%', '-60%', '-45%', '-50%'],
+                        y: ['-50%', '-40%', '-55%', '-45%', '-50%'],
+                        scale: [1, 1.2, 0.8, 1.1, 1],
                     }}
                     transition={{
                         duration: 15,
                         repeat: Infinity,
                         ease: 'easeInOut',
-                        delay: 1,
-                    }}
-                />
-
-                {/* Noise overlay for texture */}
-                <div
-                    className="absolute inset-0 opacity-30 mix-blend-soft-light"
-                    style={{
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                        delay: 3,
                     }}
                 />
             </div>
@@ -171,6 +168,3 @@ export function useNetworkTheme() {
         return NETWORK_THEMES[chainId as keyof typeof NETWORK_THEMES] || NETWORK_THEMES.default;
     }, [isConnected, chainId]);
 }
-
-// Export themes for use elsewhere
-export { NETWORK_THEMES };

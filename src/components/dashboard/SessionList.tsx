@@ -16,6 +16,7 @@ export interface Session {
     status: 'active' | 'expired' | 'revoked';
     createdAt: string;
     chainId?: number;
+    txHash?: `0x${string}`; // Transaction hash for onchain proof
 }
 
 interface SessionListProps {
@@ -121,10 +122,10 @@ function SessionCard({ session, isExpanded, onToggleExpand, onRevoke, onRefresh 
                     {/* Left: Info */}
                     <div className="flex items-start gap-4 flex-1">
                         <div className={`h-12 w-12 rounded-xl flex items-center justify-center shrink-0 transition-colors ${isExpired
-                                ? 'bg-danger/10 text-danger'
-                                : isExpiringSoon
-                                    ? 'bg-warning/10 text-warning'
-                                    : 'bg-primary/10 text-primary'
+                            ? 'bg-danger/10 text-danger'
+                            : isExpiringSoon
+                                ? 'bg-warning/10 text-warning'
+                                : 'bg-primary/10 text-primary'
                             }`}>
                             <Globe className="h-6 w-6" />
                         </div>

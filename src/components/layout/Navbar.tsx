@@ -11,8 +11,9 @@ interface NavbarProps {
     onLogoClick?: () => void;
 }
 
-// Network badge component with animated color
-function NetworkBadge() {
+// Network button - clickable to switch networks
+function NetworkButton() {
+    const { open } = useAppKit();
     const { isConnected } = useAccount();
     const chainId = useChainId();
     const theme = useNetworkTheme();
@@ -25,29 +26,20 @@ function NetworkBadge() {
         <AnimatePresence mode="wait">
             <motion.button
                 key={chainId}
-                initial={{ opacity: 0, scale: 0.9, x: -10 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.9, x: 10 }}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
-                className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all"
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 5 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => open({ view: 'Networks' })}
+                className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all hover:opacity-80"
                 style={{
-                    backgroundColor: `${theme.primary}15`,
-                    borderColor: `${theme.primary}30`,
+                    backgroundColor: `${theme.primary}20`,
+                    borderColor: `${theme.primary}40`,
                 }}
-                onClick={() => { }}
             >
-                <motion.span
+                <span
                     className="h-2 w-2 rounded-full"
                     style={{ backgroundColor: theme.primary }}
-                    animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [1, 0.7, 1],
-                    }}
-                    transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: 'easeInOut',
-                    }}
                 />
                 <span className="text-sm font-medium" style={{ color: theme.primary }}>
                     {networkName}
@@ -64,13 +56,13 @@ export function Navbar({ onMenuClick, onLogoClick }: NavbarProps) {
 
     return (
         <motion.header
-            className="sticky top-0 z-40 w-full border-b bg-background/60 backdrop-blur-xl"
+            className="sticky top-0 z-40 w-full border-b backdrop-blur-xl"
             style={{
-                borderColor: isConnected ? `${theme.primary}20` : 'rgba(255,255,255,0.1)',
+                backgroundColor: 'rgba(11, 12, 21, 0.7)',
+                borderColor: isConnected ? `${theme.primary}30` : 'rgba(255,255,255,0.1)',
             }}
-            initial={false}
             animate={{
-                borderColor: isConnected ? `${theme.primary}20` : 'rgba(255,255,255,0.1)',
+                borderColor: isConnected ? `${theme.primary}30` : 'rgba(255,255,255,0.1)',
             }}
             transition={{ duration: 0.5 }}
         >
@@ -83,34 +75,22 @@ export function Navbar({ onMenuClick, onLogoClick }: NavbarProps) {
                         <Menu className="h-6 w-6" />
                     </button>
 
-                    {/* Clickable Logo with animated glow */}
+                    {/* Clickable Logo */}
                     <motion.button
                         onClick={onLogoClick}
                         className="flex items-center gap-2 group"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                     >
-                        <motion.div
-                            className="flex h-8 w-8 items-center justify-center rounded-lg"
+                        <div
+                            className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
                             style={{
-                                backgroundColor: `${theme.primary}15`,
+                                backgroundColor: `${theme.primary}20`,
                                 color: theme.primary,
-                            }}
-                            animate={{
-                                boxShadow: [
-                                    `0 0 10px ${theme.primary}20`,
-                                    `0 0 20px ${theme.primary}30`,
-                                    `0 0 10px ${theme.primary}20`,
-                                ],
-                            }}
-                            transition={{
-                                duration: 3,
-                                repeat: Infinity,
-                                ease: 'easeInOut',
                             }}
                         >
                             <Shield className="h-5 w-5" />
-                        </motion.div>
+                        </div>
                         <span className="text-lg font-bold tracking-tight text-text-primary font-display">
                             Smart Session
                         </span>
@@ -118,20 +98,8 @@ export function Navbar({ onMenuClick, onLogoClick }: NavbarProps) {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    {/* Network Badge */}
-                    <NetworkBadge />
-
-                    {/* Network Switch Button */}
-                    {isConnected && (
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => open({ view: 'Networks' })}
-                            className="hidden sm:flex"
-                        >
-                            Switch
-                        </Button>
-                    )}
+                    {/* Network Button - Click to switch */}
+                    <NetworkButton />
 
                     {/* Wallet Connect Button */}
                     <motion.div
@@ -144,6 +112,7 @@ export function Navbar({ onMenuClick, onLogoClick }: NavbarProps) {
                             size="sm"
                             style={isConnected ? {
                                 borderColor: `${theme.primary}40`,
+                                color: theme.primary,
                             } : {}}
                         >
                             {isConnected ? 'Account' : 'Connect Wallet'}

@@ -19,10 +19,11 @@ export const CONTRACT_ADDRESSES: Record<
 };
 
 // -------------------------------------------------------------
-// 2. CONTRACT ABI (SmartSessionTarget)
+// 2. CONTRACT ABI (SmartSessionTarget - with session management)
 // -------------------------------------------------------------
 
 export const SMART_SESSION_ABI: Abi = [
+  // Store function for session creation proof
   {
     type: "function",
     name: "store",
@@ -36,6 +37,7 @@ export const SMART_SESSION_ABI: Abi = [
     ],
     outputs: [],
   },
+  // Get current value
   {
     type: "function",
     name: "get",
@@ -49,6 +51,7 @@ export const SMART_SESSION_ABI: Abi = [
       },
     ],
   },
+  // Event for tracking
   {
     type: "event",
     name: "NumberUpdated",
@@ -70,25 +73,69 @@ export const SMART_SESSION_ABI: Abi = [
   },
 ];
 
+// Session creation data encoded as uint256 for on-chain proof
+export function encodeSessionData(
+  targetAddress: string,
+  permissions: string[],
+  expiryTimestamp: number
+): bigint {
+  // Simple encoding: first 20 bytes = target address, last 12 bytes = expiry
+  const targetBn = BigInt(targetAddress);
+  const expiryBn = BigInt(expiryTimestamp);
+  // Combine: shift target by 96 bits (12 bytes) and add expiry
+  return (targetBn << BigInt(96)) | expiryBn;
+}
+
+// Decode session data from uint256
+export function decodeSessionData(encoded: bigint): {
+  targetAddress: string;
+  expiryTimestamp: number;
+} {
+  const expiryMask = (BigInt(1) << BigInt(96)) - BigInt(1);
+  const expiry = Number(encoded & expiryMask);
+  const target = encoded >> BigInt(96);
+  return {
+    targetAddress: "0x" + target.toString(16).padStart(40, "0") as `0x${string}`,
+    expiryTimestamp: expiry,
+  };
+}
+
+// Revocation data - use a special prefix to indicate revocation
+export function encodeRevocationData(sessionId: string): bigint {
+  // Use hash of sessionId as the revocation marker
+  const hash = sessionId.split('').reduce((a, b) => {
+    a = ((a << 5) - a) + b.charCodeAt(0);
+    return a & a;
+  }, 0);
+  // Add revocation prefix (0xDEAD)
+  return BigInt(0xDEAD) << BigInt(240) | BigInt(Math.abs(hash));
+}
+
 // -------------------------------------------------------------
-// 3. CHAIN CONFIG METADATA (optional but very helpful for UI)
+// 3. CHAIN CONFIG METADATA
 // -------------------------------------------------------------
 
 export const CHAIN_METADATA = {
   base: {
     id: 8453,
     name: "Base Mainnet",
-    explorer: "https://basescan.org/address/",
+    explorer: "https://basescan.org",
+    txExplorer: "https://basescan.org/tx/",
+    addressExplorer: "https://basescan.org/address/",
   },
   optimism: {
     id: 10,
     name: "Optimism",
-    explorer: "https://optimistic.etherscan.io/address/",
+    explorer: "https://optimistic.etherscan.io",
+    txExplorer: "https://optimistic.etherscan.io/tx/",
+    addressExplorer: "https://optimistic.etherscan.io/address/",
   },
   celo: {
     id: 42220,
     name: "Celo",
-    explorer: "https://celoscan.io/address/",
+    explorer: "https://celoscan.io",
+    txExplorer: "https://celoscan.io/tx/",
+    addressExplorer: "https://celoscan.io/address/",
   },
 };
 
@@ -127,7 +174,7 @@ export function getChainMetadata(chainId: number) {
 }
 
 // -------------------------------------------------------------
-// 5. EXPORT DEFAULT (Optional convenience)
+// 5. EXPORT DEFAULT
 // -------------------------------------------------------------
 
 export default {
@@ -136,4 +183,7 @@ export default {
   CHAIN_METADATA,
   getContractAddressByChainId,
   getChainMetadata,
+  encodeSessionData,
+  decodeSessionData,
+  encodeRevocationData,
 };

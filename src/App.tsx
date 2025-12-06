@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useChainId } from "wagmi";
 import { Layout } from "./components/layout/Layout";
 import { LandingPage } from "./components/LandingPage";
 import { CreateSessionWizard } from "./components/create-session/CreateSessionWizard";
@@ -9,62 +9,54 @@ import { SettingsPage } from "./components/SettingsPage";
 import { Card } from "./components/ui/Card";
 import { Button } from "./components/ui/Button";
 import { ToastProvider, useToast } from "./components/ui/Toast";
-import { Shield, Plus, Clock, Activity, TrendingUp } from "lucide-react";
+import { useSessionContract } from "./hooks/useSessionContract";
+import { Shield, Plus, Clock, Activity, TrendingUp, ExternalLink } from "lucide-react";
 
-// Mock Data with proper expiry timestamps
-const createMockSessions = (): Session[] => [
-  {
-    id: 'session-1',
-    targetAddress: '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D',
-    targetName: 'Uniswap V2 Router',
-    permissions: ['swapExactTokensForTokens', 'swapTokensForExactTokens'],
-    expiry: new Date(Date.now() + 55 * 60 * 1000).toISOString(), // 55 minutes
-    status: 'active',
-    createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-    chainId: 8453
-  },
-  {
-    id: 'session-2',
-    targetAddress: '0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45',
-    targetName: 'Uniswap V3 Router',
-    permissions: ['exactInputSingle', 'exactOutputSingle'],
-    expiry: new Date(Date.now() + 23 * 60 * 60 * 1000).toISOString(), // 23 hours
-    status: 'active',
-    createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-    chainId: 8453
-  },
-  {
-    id: 'session-3',
-    targetAddress: '0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2',
-    targetName: 'Aave V3 Pool',
-    permissions: ['supply', 'borrow', 'repay'],
-    expiry: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString(), // 6 days
-    status: 'active',
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    chainId: 10
-  }
-];
+// Start with empty sessions - will be populated from onchain
+const createMockSessions = (): Session[] => [];
 
 type View = 'dashboard' | 'create' | 'activity' | 'settings';
 
 function AppContent() {
   const { isConnected } = useAccount();
-  const { success, error } = useToast();
+  const chainId = useChainId();
+  const { success, error, info } = useToast();
   const [view, setView] = useState<View>('dashboard');
   const [sessions, setSessions] = useState<Session[]>(createMockSessions);
-  const [isRevoking, setIsRevoking] = useState(false);
+
+  const {
+    createSession: createSessionOnchain,
+    revokeSession: revokeSessionOnchain,
+    isCreating,
+    isRevoking,
+    isConfirming,
+    chainMetadata
+  } = useSessionContract();
 
   const handleRevoke = async (id: string) => {
-    setIsRevoking(true);
     try {
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 500));
+      info('Please confirm the transaction in your wallet...');
+      const result = await revokeSessionOnchain(id);
       setSessions(sessions.filter(s => s.id !== id));
-      success('Session revoked successfully');
-    } catch (err) {
-      error('Failed to revoke session');
-    } finally {
-      setIsRevoking(false);
+      success(
+        <div className="flex items-center gap-2">
+          <span>Session revoked!</span>
+          <a
+            href={result.explorerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-primary hover:underline"
+          >
+            View tx <ExternalLink className="h-3 w-3" />
+          </a>
+        </div>
+      );
+    } catch (err: any) {
+      if (err?.message?.includes('User rejected')) {
+        error('Transaction cancelled');
+      } else {
+        error('Failed to revoke session: ' + (err?.message || 'Unknown error'));
+      }
     }
   };
 
@@ -82,7 +74,7 @@ function AppContent() {
     }
   };
 
-  const handleCreateComplete = (formData: { targetAddress: string; targetName: string; permissions: string[]; expiry: string }) => {
+  const handleCreateComplete = async (formData: { targetAddress: string; targetName: string; permissions: string[]; expiry: string }) => {
     const getExpiryMs = (expiry: string): number => {
       switch (expiry) {
         case '1h': return 60 * 60 * 1000;
@@ -93,19 +85,49 @@ function AppContent() {
       }
     };
 
-    const newSession: Session = {
-      id: `session-${Date.now()}`,
-      targetAddress: formData.targetAddress,
-      targetName: formData.targetName || 'Custom Session',
-      permissions: formData.permissions,
-      expiry: new Date(Date.now() + getExpiryMs(formData.expiry)).toISOString(),
-      status: 'active',
-      createdAt: new Date().toISOString(),
-      chainId: 8453
-    };
-    setSessions([newSession, ...sessions]);
-    setView('dashboard');
-    success('Session created successfully! 🎉');
+    try {
+      info('Please confirm the transaction in your wallet...');
+      const result = await createSessionOnchain({
+        targetAddress: formData.targetAddress,
+        targetName: formData.targetName,
+        permissions: formData.permissions,
+        expiry: formData.expiry,
+      });
+
+      const newSession: Session = {
+        id: `session-${Date.now()}`,
+        targetAddress: formData.targetAddress,
+        targetName: formData.targetName || 'Custom Session',
+        permissions: formData.permissions,
+        expiry: new Date(Date.now() + getExpiryMs(formData.expiry)).toISOString(),
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        chainId: chainId,
+        txHash: result.hash,
+      };
+      setSessions([newSession, ...sessions]);
+      setView('dashboard');
+      success(
+        <div className="flex items-center gap-2">
+          <span>Session created! 🎉</span>
+          <a
+            href={result.explorerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-primary hover:underline"
+          >
+            View tx <ExternalLink className="h-3 w-3" />
+          </a>
+        </div>
+      );
+    } catch (err: any) {
+      if (err?.message?.includes('User rejected')) {
+        error('Transaction cancelled');
+      } else {
+        error('Failed to create session: ' + (err?.message || 'Unknown error'));
+      }
+      // Stay on create view if failed
+    }
   };
 
   const handleNavigate = (newView: View) => {
